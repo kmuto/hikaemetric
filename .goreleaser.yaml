@@ -1,0 +1,49 @@
+version: 2
+
+project_name: hikaemetric
+
+builds:
+  - id: hikaemetric
+    main: .
+    binary: hikaemetric
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: amd64
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - id: zip
+    formats:
+      - zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+nfpms:
+  - id: packages
+    package_name: hikaemetric
+    maintainer: kmuto <kmuto@hatena.ne.jp>
+    vendor: kmuto
+    description: OTLP metrics receiver that writes TSV files
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+
+release:
+  draft: true
