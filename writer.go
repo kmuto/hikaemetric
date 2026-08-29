@@ -81,8 +81,8 @@ func (w *TSVWriter) closeIdle() {
 	now := time.Now()
 	for key, entry := range w.files {
 		if now.Sub(entry.lastAccess) > w.idleTimeout {
-			entry.writer.Flush()
-			entry.file.Close()
+			_ = entry.writer.Flush()
+			_ = entry.file.Close()
 			delete(w.files, key)
 		}
 	}
@@ -112,7 +112,10 @@ func (w *TSVWriter) getFile(ns, svcName string, ts time.Time) (*fileEntry, error
 	bw := bufio.NewWriter(f)
 	if needHeader {
 		header := headerLine(w.resourceAttrKeys, w.attrKeys)
-		fmt.Fprintln(bw, header)
+		if _, err := fmt.Fprintln(bw, header); err != nil {
+			_ = f.Close()
+			return nil, fmt.Errorf("write header: %w", err)
+		}
 	}
 
 	entry := &fileEntry{
@@ -134,7 +137,9 @@ func (w *TSVWriter) WriteRows(rows []MetricRow) error {
 			return err
 		}
 		line := formatRow(row, w.resourceAttrKeys, w.attrKeys)
-		fmt.Fprintln(entry.writer, line)
+		if _, err := fmt.Fprintln(entry.writer, line); err != nil {
+			return fmt.Errorf("write row: %w", err)
+		}
 	}
 	return nil
 }
@@ -143,7 +148,7 @@ func (w *TSVWriter) Flush() {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	for _, entry := range w.files {
-		entry.writer.Flush()
+		_ = entry.writer.Flush()
 	}
 }
 
@@ -154,8 +159,8 @@ func (w *TSVWriter) Close() {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	for key, entry := range w.files {
-		entry.writer.Flush()
-		entry.file.Close()
+		_ = entry.writer.Flush()
+		_ = entry.file.Close()
 		delete(w.files, key)
 	}
 }

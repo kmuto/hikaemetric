@@ -94,7 +94,9 @@ func TestWriterAppendsWithoutHeader(t *testing.T) {
 	loc := time.UTC
 
 	path := filepath.Join(dir, "web-20260829.tsv")
-	os.WriteFile(path, []byte("timestamp\tname\ttype\tvalue\tunit\n"), 0644)
+	if err := os.WriteFile(path, []byte("timestamp\tname\ttype\tvalue\tunit\n"), 0644); err != nil {
+		t.Fatalf("write seed file: %v", err)
+	}
 
 	w := NewTSVWriter(dir, nil, nil, loc)
 	defer w.Close()

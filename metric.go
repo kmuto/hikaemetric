@@ -274,8 +274,6 @@ func headerLine(resourceAttrKeys, attrKeys []string) string {
 	for _, k := range resourceAttrKeys {
 		fields = append(fields, "resource."+k)
 	}
-	for _, k := range attrKeys {
-		fields = append(fields, k)
-	}
+	fields = append(fields, attrKeys...)
 	return strings.Join(fields, "\t")
 }

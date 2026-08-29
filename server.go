@@ -43,7 +43,7 @@ func (s *Server) handleMetrics(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("read body: %v", err), http.StatusBadRequest)
 		return
 	}
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 
 	req := &collpb.ExportMetricsServiceRequest{}
 	if err := proto.Unmarshal(body, req); err != nil {
@@ -67,7 +67,7 @@ func (s *Server) handleMetrics(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/x-protobuf")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respBytes)
+	_, _ = w.Write(respBytes)
 }
 
 func (s *Server) ListenAndServe() error {
