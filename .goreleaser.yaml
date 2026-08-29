@@ -30,7 +30,7 @@ archives:
 nfpms:
   - id: packages
     package_name: hikaemetric
-    maintainer: kmuto <kmuto@hatena.ne.jp>
+    maintainer: kmuto <kmuto@kmuto.jp>
     vendor: kmuto
     description: OTLP metrics receiver that writes TSV files
     license: MIT
